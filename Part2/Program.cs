@@ -116,7 +116,7 @@ namespace Part1
                 if (Path.GetExtension(fileName) == ".node")
                 {
                     StreamReader reader = new StreamReader(fileName);
-                    Node<object> node = new Node<object>(Path.GetFileNameWithoutExtension(fileName), reader.ReadToEnd());
+                    Node<object> node = new Node<object>(Path.GetFileNameWithoutExtension(fileName), JsonSerializer.Deserialize<object>(reader.ReadToEnd()));
                     this.Add(node);
                 }
             }
@@ -129,6 +129,7 @@ namespace Part1
             Vault vault = new Vault();
             vault.Load();
             Console.WriteLine(vault.Count());
+            Console.WriteLine(vault.Find("FirstNode").Object());
             List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6 };
             Node<object> node = new Node<object>("hello",list);
             vault.Add(node);
