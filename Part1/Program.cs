@@ -102,10 +102,8 @@ namespace Part1
             }
             
         }
-        //partial void GetNodes();
         public void Load()
-        {
-            //GetNodes();
+        {          
             this.nodes.Clear();
             string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + "\\NodesIn";
             string[] fileEntries = Directory.GetFiles(path);
