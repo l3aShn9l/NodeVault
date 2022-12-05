@@ -1,31 +1,32 @@
 ﻿using System;
 using System.Reflection;
+using System.Text.Json;
 using System.Collections;
 
 namespace Part1
 {
-    class Node
+    class Node<T>
     {
         string name = "";
-        string text = "";
+        T obj;
         public string Name()
         {
             return this.name;
         }
-        public string Text()
+        public T Object()
         {
-            return this.text;
+            return this.obj;
         }
         public Node() { }
-        public Node(string name, string text)
+        public Node(string name, T obj)
         {
             this.name = name;
-            this.text = text;
+            this.obj = obj;
         }
     }
     partial class Vault : IEnumerable
     {
-        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+        private Dictionary<string, Node<object>> nodes = new Dictionary<string, Node<object>>();
         /* По условию нам необходимо добиться максимального быстродействия, про ограничения по памяти не указано.
         По требуемому функционалу наиболее подходящим выглядит Dictionary
         Поиск по имени (ключу) за O(1)
@@ -43,7 +44,7 @@ namespace Part1
         }
 
         //Поиск (способ №1)
-        public Node Find(string name)
+        public Node<object> Find(string name)
         {
             try
             {
@@ -69,7 +70,7 @@ namespace Part1
                 }
             }
         }*/
-        public void Add(Node node)
+        public void Add(Node<object> node)
         {
             try
             {
@@ -94,13 +95,14 @@ namespace Part1
                 FileInfo fileInfo = new FileInfo(fileName);
                 fileInfo.Delete();
             }
-            foreach (Node item in this)
+            foreach (Node<object> item in this)
             {
                 StreamWriter writer = new StreamWriter(path + $"\\{item.Name()}.node", false);
-                writer.Write(item.Text());
+                string json = JsonSerializer.Serialize(item.Object());
+                writer.Write(json);
                 writer.Close();
             }
-            
+
         }
         //partial void GetNodes();
         public void Load()
@@ -111,10 +113,10 @@ namespace Part1
             string[] fileEntries = Directory.GetFiles(path);
             foreach (string fileName in fileEntries)
             {
-                if(Path.GetExtension(fileName) == ".node" )
+                if (Path.GetExtension(fileName) == ".node")
                 {
                     StreamReader reader = new StreamReader(fileName);
-                    Node node = new Node(Path.GetFileNameWithoutExtension(fileName),reader.ReadToEnd());
+                    Node<object> node = new Node<object>(Path.GetFileNameWithoutExtension(fileName), reader.ReadToEnd());
                     this.Add(node);
                 }
             }
@@ -127,13 +129,14 @@ namespace Part1
             Vault vault = new Vault();
             vault.Load();
             Console.WriteLine(vault.Count());
-            foreach(Node item in vault)
+            List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6 };
+            Node<object> node = new Node<object>("hello",list);
+            vault.Add(node);
+            foreach (Node<object> item in vault)
             {
                 Console.WriteLine(item.Name());
             }
             vault.Save();
-            //Console.WriteLine(vault["FirstNode"].Text());
-            Console.WriteLine(vault.Find("FirstNode").Text());
         }
     }
 }
