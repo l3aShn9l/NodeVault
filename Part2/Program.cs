@@ -3,9 +3,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Collections;
 
-namespace Part1
+namespace Part2
 {
-    class Node<T>
+    public class Node<T>
     {
         string name = "";
         T obj;
@@ -24,8 +24,10 @@ namespace Part1
             this.obj = obj;
         }
     }
-    partial class Vault : IEnumerable
+    public partial class Vault : IEnumerable
     {
+        public string dirpath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+
         private Dictionary<string, Node<object>> nodes = new Dictionary<string, Node<object>>();
         /* По условию нам необходимо добиться максимального быстродействия, про ограничения по памяти не указано.
         По требуемому функционалу наиболее подходящим выглядит Dictionary
@@ -86,39 +88,9 @@ namespace Part1
             return this.nodes.Count();
         }
         public Vault() { }
-        public void Save()
-        {
-            string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + "\\NodesOut";
-            string[] fileEntries = Directory.GetFiles(path);
-            foreach (string fileName in fileEntries)
-            {
-                FileInfo fileInfo = new FileInfo(fileName);
-                fileInfo.Delete();
-            }
-            foreach (Node<object> item in this)
-            {
-                StreamWriter writer = new StreamWriter(path + $"\\{item.Name()}.node", false);
-                string json = JsonSerializer.Serialize(item.Object());
-                writer.Write(json);
-                writer.Close();
-            }
+        public partial void Save();
+        public partial void Load();
 
-        }
-        public void Load()
-        {
-            this.nodes.Clear();
-            string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName + "\\NodesIn";
-            string[] fileEntries = Directory.GetFiles(path);
-            foreach (string fileName in fileEntries)
-            {
-                if (Path.GetExtension(fileName) == ".node")
-                {
-                    StreamReader reader = new StreamReader(fileName);
-                    Node<object> node = new Node<object>(Path.GetFileNameWithoutExtension(fileName), JsonSerializer.Deserialize<object>(reader.ReadToEnd()));
-                    this.Add(node);
-                }
-            }
-        }
     }
     internal partial class Program
     {
